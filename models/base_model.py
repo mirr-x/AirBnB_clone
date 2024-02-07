@@ -45,7 +45,6 @@ class BaseModel():
 
     def to_dict(self):
         my_dict_z = {}
-        # self.__dict__["__class__"] = self.__class__.__name__
         x = self.updated_at.isoformat()
         y = self.created_at.isoformat()
 

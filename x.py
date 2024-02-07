@@ -1,17 +1,14 @@
-class MyClass:
-    pass
+from datetime import datetime
 
+# Your input string
+input_string = '2024-02-07T21:33:25.062671'
 
-class AnotherClass:
-    pass
+# Define the format of your input string
+date_format = '%Y-%m-%dT%H:%M:%S.%f'
 
+# Use strptime to parse the string into a datetime object
+parsed_datetime = datetime.strptime(input_string, date_format)
 
-# Example class name provided as an argument
-arg = "MyCass"
-
-arg2 = MyClass()
-# Using globals()[arg] to dynamically access the class
-my_instance = globals()[arg]()
-
-# Now my_instance is an instance of the MyClass class
-print(isinstance(my_instance, MyClass))  # Output: True
+# Print the datetime object using its __repr__ format
+print(repr(parsed_datetime))
+# Output: datetime.datetime(2024, 2, 7, 21, 33, 25, 62671)

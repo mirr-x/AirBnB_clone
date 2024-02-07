@@ -22,6 +22,11 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     def do_create(self, content):
+        '''
+        - Creates a new instance of class .
+
+            - Usage => create [className]
+        '''
         ln = len(content)
 
         if ln == 0:
@@ -35,6 +40,11 @@ class HBNBCommand(cmd.Cmd):
             print(instance_id)
 
     def do_show(self, content):
+        """
+        - Display instance based on the class name and id .
+
+            - Usage =>  show [className] [id]
+        """
 
         ln = len(content)
         lis = content.split(" ")
@@ -64,6 +74,11 @@ class HBNBCommand(cmd.Cmd):
                 print("** no instance found **")
 
     def do_destroy(self, content):
+        '''
+        - Deletes an instance based on the class name and id .
+
+            - Usage => destroy [className] [id]
+        '''
 
         lis = content.split(" ")
         ln = len(content)
@@ -81,9 +96,9 @@ class HBNBCommand(cmd.Cmd):
             key_form = "{:s}.{:s}".format(lis[0], lis[1])
 
             for i in json_dict.keys():
-                if key_form == i: 
+                if key_form == i:
                     del json_dict[key_form]
-                    
+
                     with open("file.json", "w") as f:
                         json.dump(json_dict, f, indent=2)
 
@@ -91,14 +106,37 @@ class HBNBCommand(cmd.Cmd):
                     break
             if bol != True:
                 print("** no instance found **")
-        
-        
+
         # todo
-        def do_all(self,content):
-            # todo
+    def do_all(self, content):
+        '''
+        - display all instances based on class name or not 
+
+            - Usage => all [className] or all
+        '''
+
+        lis = content.split(" ")
+        ln = len(content)
+        lis_ln = len(lis)
+        bol =None
+
+        if ln == 0:
+            bol =True
+        elif lis[0] not in globals() or lis_ln > 1:
+            print("** class doesn't exist **")
+        else:
+            bol =True
+
+        if bol == True:
+            all_dict = storage.all()
+            all_dict_lis = []
+            for i in all_dict.keys():
+                sp = i.split(".")
+                form_full = "[{:s}] ({:s}) {:s}".format(sp[0], sp[1],str(all_dict[i]))
+
+            print(form_full)
 
 
-        pass
 
     #!!!!!!!!!!!!!!!
 
