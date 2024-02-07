@@ -63,7 +63,6 @@ class HBNBCommand(cmd.Cmd):
             else:
                 print("** no instance found **")
 
-    # todo
     def do_destroy(self, content):
 
         lis = content.split(" ")
@@ -92,10 +91,12 @@ class HBNBCommand(cmd.Cmd):
                     break
             if bol != True:
                 print("** no instance found **")
+        
+        
+        # todo
+        def do_all(self,content):
+            # todo
 
-
-
-        print("z")
 
         pass
 
