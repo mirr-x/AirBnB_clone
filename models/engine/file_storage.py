@@ -2,7 +2,6 @@
 
 import json
 import os
-# from . import objx
 from models.base_model import BaseModel
 
 
@@ -49,8 +48,6 @@ class FileStorage():
         from models.base_model import BaseModel
 
         FileStorage.__objects[self.key_id] = self.bs_objet.to_dict()
-
-        # self.__objects[x.key_clas] = x.to_dict()
 
         with open(FileStorage.__file_path, "w") as f:
             json.dump(FileStorage.__objects, f, indent=2)
