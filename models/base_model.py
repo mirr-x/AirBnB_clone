@@ -48,6 +48,8 @@ class BaseModel():
         x = self.updated_at.isoformat()
         y = self.created_at.isoformat()
 
+        my_dict_z["__class__"] = self.__class__.__name__
+        
         for k, v in self.__dict__.items():
             if k == "updated_at":
                 my_dict_z[k] = x
@@ -57,7 +59,6 @@ class BaseModel():
             else:
                 my_dict_z[k] = v
 
-        my_dict_z["__class__"] = self.__class__.__name__
         return my_dict_z
 
     # tODO ''' __STR__ method return string when print the object '''
