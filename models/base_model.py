@@ -48,10 +48,11 @@ class BaseModel():
         x = self.updated_at.isoformat()
         y = self.created_at.isoformat()
 
-        my_dict_z["__class__"] = self.__class__.__name__
-        
-        for k, v in self.__dict__.items():
+        lk = self.__dict__
+
+        for k, v in lk.items():
             if k == "updated_at":
+                my_dict_z["__class__"] = self.__class__.__name__
                 my_dict_z[k] = x
                 continue
             elif k == "created_at":
