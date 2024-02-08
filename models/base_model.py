@@ -10,9 +10,10 @@ class BaseModel():
     def __init__(self, *args, **kwargs):
         self.my_number = None
         self.name = None
-        self.updated_at = datetime.now()
         self.id = str(uuid4())
         self.created_at = datetime.now()
+        self.updated_at = datetime.now()
+
 
         # storage
         from models import storage
