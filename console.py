@@ -4,6 +4,7 @@ import cmd
 from models.base_model import BaseModel
 from models import storage
 import json
+from datetime import datetime
 
 
 class HBNBCommand(cmd.Cmd):
@@ -12,11 +13,11 @@ class HBNBCommand(cmd.Cmd):
 
     def do_quit(self, content):
         """Exit the prompt."""
-        return True
+        return (True)
 
     def do_EOF(self, content):
         """Exit the prompt. using ctrl + d """
-        return True
+        return (True)
 
     def emptyline(self):
         pass
@@ -107,7 +108,32 @@ class HBNBCommand(cmd.Cmd):
             if bol != True:
                 print("** no instance found **")
 
-        # todo
+    #! my methods
+    ''' formating the string '''
+
+    def formating(self, g):
+        dic = g
+        tm_fmt = "%Y-%m-%dT%H:%M:%S.%f"
+
+        parsed_datetime1 = datetime.strptime(dic["created_at"], tm_fmt)
+        parsed_datetime2 = datetime.strptime(dic["updated_at"], tm_fmt)
+
+        dic["created_at"] = parsed_datetime1
+        dic["updated_at"] = parsed_datetime2
+
+        return (dic)
+
+    def id_checker(self, id_z):
+        base_data_json = storage.all()
+
+        for i in base_data_json.keys():
+            chk_id = base_data_json[i]["id"]
+            if chk_id == id_z:
+                return (1)
+        return (0)
+
+    #! my methods
+
     def do_all(self, content):
         '''
         - display all instances based on class name or not 
@@ -118,28 +144,81 @@ class HBNBCommand(cmd.Cmd):
         lis = content.split(" ")
         ln = len(content)
         lis_ln = len(lis)
-        bol =None
+        bol = None
 
         if ln == 0:
-            bol =True
+            bol = True
         elif lis[0] not in globals() or lis_ln > 1:
             print("** class doesn't exist **")
         else:
-            bol =True
+            bol = True
 
         if bol == True:
             all_dict = storage.all()
             all_dict_lis = []
             for i in all_dict.keys():
                 sp = i.split(".")
-                form_full = "[{:s}] ({:s}) {:s}".format(sp[0], sp[1],str(all_dict[i]))
+                x = self.formating(all_dict[i])
+                form_full = "[{:s}] ({:s}) {:s}".format(sp[0], sp[1], str(x))
+                print(form_full)
 
-            print(form_full)
+    # todo
+    def do_update(self, content):
+        '''
+        - Updates an instance based on the class name and id by adding or updating attribute
 
+            - Usage => update <class name> <id> <attribute name> "<attribute value>"
+        '''
+
+        lis = content.split(" ")
+        ln = len(content)
+        lis_ln = len(lis)
+
+        not_allowed = ["id", "created_at", "updated_at"]
+        bol = 0
+
+        if lis_ln > 4:
+            print("!! to many argument")
+            return
+        elif lis_ln < 4:
+            print("!! less argument")
+            return
+
+        if ln == 0:
+            print("** class name missing **")
+        elif lis[0] not in globals():
+            print("** class doesn't exist **")
+        elif lis_ln == 1:
+            print("** instance id missing **")
+        elif self.id_checker(lis[1]) == 0:
+            print("** no instance found **")
+        elif lis_ln == 2:
+            print("** attribute name missing **")
+        elif lis_ln == 3:
+            print("** value missing **")
+        elif lis[2] not in not_allowed:
+            dic = storage.all()
+            for x in dic.keys():
+                if lis[1] == dic[x]["id"]:
+                    user_dic = dic[x]
+                    for x2 in user_dic.keys():
+                        if lis[2] == x2:
+                            #! castinggggggggg
+                            if lis[3].isdigit():
+                                user_dic[x2] = int(lis[3])
+                            else:
+                                user_dic[x2] = str(lis[3])
+                            bol = 1
+                            break
+                    if bol == 1:
+                        break
+            if bol == 1:
+                with open("file.json", "w") as f:
+                    json.dump(dic, f, indent=2)
+            else:
+                print("** no attribute found **")
 
 
     #!!!!!!!!!!!!!!!
-
-
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
