@@ -5,6 +5,7 @@ from models.base_model import BaseModel
 from models import storage
 import json
 from datetime import datetime
+from models.user import User
 
 
 class HBNBCommand(cmd.Cmd):
@@ -196,12 +197,15 @@ class HBNBCommand(cmd.Cmd):
             print("** attribute name missing **")
         elif lis_ln == 3:
             print("** value missing **")
-        elif lis[2] not in not_allowed:
+        elif lis[2] not in not_allowed:  # !! update to searching on classe attrebuit not json file
             dic = storage.all()
+            if lis[0] == User.__name__:
+                attrbutes = [x for x in User.__dict__ if not x.startswith('__')]
             for x in dic.keys():
                 if lis[1] == dic[x]["id"]:
                     user_dic = dic[x]
-                    for x2 in user_dic.keys():
+                    for x2 in attrbutes:
+
                         if lis[2] == x2:
                             #! castinggggggggg
                             if lis[3].isdigit():
@@ -217,7 +221,6 @@ class HBNBCommand(cmd.Cmd):
                     json.dump(dic, f, indent=2)
             else:
                 print("** no attribute found **")
-
 
     #!!!!!!!!!!!!!!!
 if __name__ == '__main__':
