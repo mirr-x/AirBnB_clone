@@ -8,12 +8,9 @@ class BaseModel():
 
     # tODO ''' __iNiT__ method '''
     def __init__(self, *args, **kwargs):
-        self.my_number = None
-        self.name = None
         self.id = str(uuid4())
         self.created_at = datetime.now()
         self.updated_at = datetime.now()
-
 
         # storage
         from models import storage
@@ -66,7 +63,12 @@ class BaseModel():
     # tODO ''' __STR__ method return string when print the object '''
 
     def __str__(self):
-        rus_z = "[{:s}] ({:s}) {:s}".format(self.__class__.__name__, self.id, str(self.__dict__))
+
+        clase_name = self.__class__.__name__
+        id_us = self.id
+        dictn = str(self.__dict__)
+
+        rus_z = "[{:s}] ({:s}) {:s}".format(clase_name, id_us, dictn)
 
         return rus_z
 
