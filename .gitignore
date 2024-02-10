@@ -2,3 +2,4 @@
 .vscode/
 file.json
 x.py
+__pycache__/
