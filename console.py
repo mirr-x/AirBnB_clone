@@ -250,6 +250,27 @@ class HBNBCommand(cmd.Cmd):
         # return the formatted string
         return (formatted_date)
 
+    def full_format(self, dictnery):
+
+        dic = dictnery
+
+        # change create_at and update_at foramt to an opject
+        z_create_at = self.time_to_obgect(dic["created_at"])
+        z_update_at = self.time_to_obgect(dic["updated_at"])
+        dic["created_at"] = z_create_at
+        dic["updated_at"] = z_update_at
+
+        #formating
+
+        instance_class_name = dic["__class__"]
+        instance_id = dic["id"]
+        instance_key_dic = str(dic)
+        full_format = "[{:s}] ({:s}) {:s}".format(instance_class_name, instance_id, instance_key_dic)
+
+        return (full_format)
+
+
+
     #! my methods------------------------
 
     #! Built-in methods in CMD-module----------------
@@ -276,17 +297,7 @@ class HBNBCommand(cmd.Cmd):
                 for i in dic.keys():
                     if dic[i]["__class__"] == lis[0]:
 
-                        # change create_at and update_at foramt to an opject
-                        z_create_at = self.time_to_obgect(dic[i]["created_at"])
-                        z_update_at = self.time_to_obgect(dic[i]["updated_at"])
-                        dic[i]["created_at"] = z_create_at
-                        dic[i]["updated_at"] = z_update_at
-
-                        instance_class_name = dic[i]["__class__"]
-                        instance_id = dic[i]["id"]
-                        instance_key_dic = str(dic[i])
-
-                        full_format = "[{:s}] ({:s}) {:s}".format(instance_class_name, instance_id, instance_key_dic)
+                        full_format = self.full_format(dic[i])
 
                         instance_list += [full_format]
                         bol = 1
@@ -310,7 +321,26 @@ class HBNBCommand(cmd.Cmd):
 
             else:
                 print("*** Unknown classe: {:s}".format(content))
+        elif method[0] == "show":
 
+            if lis[0] in globals():
+                dic = storage.all().copy()
+                method_parameter = method[1].split(")")
+                instance_id = method_parameter[0].replace('"', '')
+                ruse_dic = None
+
+                for x in dic.keys():
+                    if dic[x]["id"] == instance_id and dic[x]["__class__"]:
+                        ruse_dic = self.full_format(dic[x])
+                        bol = 1
+                        break
+                
+                if bol == 1:
+                    print(ruse_dic)
+                elif bol == 0:
+                    print("** Unknown classe or id")
+            else:
+                print("*** Unknown classe: {:s}".format(content))
         else:
             print("*** Unknown syntax: {:s}".format(content))
 
