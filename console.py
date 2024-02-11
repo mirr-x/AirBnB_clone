@@ -338,7 +338,7 @@ class HBNBCommand(cmd.Cmd):
                 if bol == 1:
                     print(ruse_dic)
                 elif bol == 0:
-                    print("** Unknown classe or id")
+                    print("** no instance found **")
             else:
                 print("*** Unknown classe: {:s}".format(content))
         else:
