@@ -6,6 +6,11 @@ from models import storage
 import json
 from datetime import datetime
 from models.user import User
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
 
 
 class HBNBCommand(cmd.Cmd):
@@ -19,9 +24,6 @@ class HBNBCommand(cmd.Cmd):
     def do_EOF(self, content):
         """Exit the prompt. using ctrl + d """
         return (True)
-
-    def emptyline(self):
-        pass
 
     def do_create(self, content):
         '''
@@ -109,32 +111,6 @@ class HBNBCommand(cmd.Cmd):
             if bol != True:
                 print("** no instance found **")
 
-    #! my methods
-    ''' formating the string '''
-
-    def formating(self, g):
-        dic = g
-        tm_fmt = "%Y-%m-%dT%H:%M:%S.%f"
-
-        parsed_datetime1 = datetime.strptime(dic["created_at"], tm_fmt)
-        parsed_datetime2 = datetime.strptime(dic["updated_at"], tm_fmt)
-
-        dic["created_at"] = parsed_datetime1
-        dic["updated_at"] = parsed_datetime2
-
-        return (dic)
-
-    def id_checker(self, id_z):
-        base_data_json = storage.all()
-
-        for i in base_data_json.keys():
-            chk_id = base_data_json[i]["id"]
-            if chk_id == id_z:
-                return (1)
-        return (0)
-
-    #! my methods
-
     def do_all(self, content):
         '''
         - display all instances based on class name or not 
@@ -163,7 +139,6 @@ class HBNBCommand(cmd.Cmd):
                 form_full = "[{:s}] ({:s}) {:s}".format(sp[0], sp[1], str(x))
                 print(form_full)
 
-    # todo
     def do_update(self, content):
         '''
         - Updates an instance based on the class name and id by adding or updating attribute
@@ -199,8 +174,22 @@ class HBNBCommand(cmd.Cmd):
             print("** value missing **")
         elif lis[2] not in not_allowed:  # !! update to searching on classe attrebuit not json file
             dic = storage.all()
-            if lis[0] == User.__name__:
+
+            if lis[0] == User.__name__:  # ? User
                 attrbutes = [x for x in User.__dict__ if not x.startswith('__')]
+            elif lis[0] == BaseModel.__name__:  # ? BaseModel
+                attrbutes = [x for x in BaseModel.__dict__ if not x.startswith('__')]
+            elif lis[0] == State.__name__:  # ? State
+                attrbutes = [x for x in State.__dict__ if not x.startswith('__')]
+            elif lis[0] == City.__name__:  # ? City
+                attrbutes = [x for x in City.__dict__ if not x.startswith('__')]
+            elif lis[0] == Amenity.__name__:  # ? Amenity
+                attrbutes = [x for x in Amenity.__dict__ if not x.startswith('__')]
+            elif lis[0] == Place.__name__:  # ? Place
+                attrbutes = [x for x in Place.__dict__ if not x.startswith('__')]
+            elif lis[0] == Review.__name__:  # ? Place
+                attrbutes = [x for x in Review.__dict__ if not x.startswith('__')]
+
             for x in dic.keys():
                 if lis[1] == dic[x]["id"]:
                     user_dic = dic[x]
@@ -210,8 +199,10 @@ class HBNBCommand(cmd.Cmd):
                             #! castinggggggggg
                             if lis[3].isdigit():
                                 user_dic[x2] = int(lis[3])
-                            else:
+                            elif type(lis[3]) == str:
                                 user_dic[x2] = str(lis[3])
+                            elif type(lis[3]) == float:
+                                user_dic[x2] = float(lis[3])
                             bol = 1
                             break
                     if bol == 1:
@@ -221,7 +212,110 @@ class HBNBCommand(cmd.Cmd):
                     json.dump(dic, f, indent=2)
             else:
                 print("** no attribute found **")
+        elif lis[2] in not_allowed:
+            print("** You do not have the permesions to do this **")
 
+    #! my methods------------------------
+    ''' formating the string '''
+
+    def formating(self, g):
+        dic = g
+        tm_fmt = "%Y-%m-%dT%H:%M:%S.%f"
+
+        parsed_datetime1 = datetime.strptime(dic["created_at"], tm_fmt)
+        parsed_datetime2 = datetime.strptime(dic["updated_at"], tm_fmt)
+
+        dic["created_at"] = parsed_datetime1
+        dic["updated_at"] = parsed_datetime2
+
+        return (dic)
+
+    def id_checker(self, id_z):
+        base_data_json = storage.all()
+
+        for i in base_data_json.keys():
+            chk_id = base_data_json[i]["id"]
+            if chk_id == id_z:
+                return (1)
+        return (0)
+
+    def time_to_obgect(self, time_z):
+
+        # Convert the string to a datetime object
+        dt_object = datetime.fromisoformat(time_z.replace('T', ' '))
+
+        # Format the datetime object as a string
+        formatted_date = repr(dt_object)
+
+        # return the formatted string
+        return (formatted_date)
+
+    #! my methods------------------------
+
+    #! Built-in methods in CMD-module----------------
+
+    def emptyline(self):
+        pass
+
+    # todo
+    def default(self, content):
+
+        lis = content.split(".")
+        method = lis[1].split("(")
+        lis_len = len(lis)
+        bol = 0
+
+        if lis_len == 1:
+            print("*** Unknown syntax: {:s}".format(content))
+        elif lis[1] == "all()":
+
+            if lis[0] in globals():
+                dic = storage.all().copy()
+                instance_list = []
+
+                for i in dic.keys():
+                    if dic[i]["__class__"] == lis[0]:
+
+                        # change create_at and update_at foramt to an opject
+                        z_create_at = self.time_to_obgect(dic[i]["created_at"])
+                        z_update_at = self.time_to_obgect(dic[i]["updated_at"])
+                        dic[i]["created_at"] = z_create_at
+                        dic[i]["updated_at"] = z_update_at
+
+                        instance_class_name = dic[i]["__class__"]
+                        instance_id = dic[i]["id"]
+                        instance_key_dic = str(dic[i])
+
+                        full_format = "[{:s}] ({:s}) {:s}".format(instance_class_name, instance_id, instance_key_dic)
+
+                        instance_list += [full_format]
+                        bol = 1
+
+                if bol == 1:
+                    print(instance_list)
+                elif bol == 0:
+                    print("*** class not found in json-file: {:s}".format(content))
+            else:
+                print("*** Unknown classe: {:s}".format(content))
+        elif lis[1] == "count()":
+
+            if lis[0] in globals():
+                dic = storage.all().copy()
+                counting = 0
+
+                for x in dic.keys():
+                    if dic[x]["__class__"] == lis[0]:
+                        counting = counting + 1
+                print(counting)
+
+            else:
+                print("*** Unknown classe: {:s}".format(content))
+        elif method[0] == "show":
+            #TOdo
+        else:
+            print("*** Unknown syntax: {:s}".format(content))
+
+    #! Built-in methods in CMD-module----------------
     #!!!!!!!!!!!!!!!
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
