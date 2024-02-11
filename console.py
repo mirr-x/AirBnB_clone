@@ -310,8 +310,7 @@ class HBNBCommand(cmd.Cmd):
 
             else:
                 print("*** Unknown classe: {:s}".format(content))
-        elif method[0] == "show":
-            #TOdo
+
         else:
             print("*** Unknown syntax: {:s}".format(content))
 
