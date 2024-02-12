@@ -11,6 +11,8 @@ from models.city import City
 from models.amenity import Amenity
 from models.place import Place
 from models.review import Review
+import ast
+
 
 
 class HBNBCommand(cmd.Cmd):
@@ -61,7 +63,7 @@ class HBNBCommand(cmd.Cmd):
         elif lis_ln == 1:
             print("** instance id missing **")
         else:
-            json_dict = storage.all()
+            json_dict = storage.all().copy()
             key = "{:s}.{:s}".format(lis[0], lis[1])
 
             x = False
@@ -101,7 +103,7 @@ class HBNBCommand(cmd.Cmd):
 
             for i in json_dict.keys():
                 if key_form == i:
-                    del json_dict[key_form]
+                    del json_dict[i]
 
                     with open("file.json", "w") as f:
                         json.dump(json_dict, f, indent=2)
@@ -131,7 +133,7 @@ class HBNBCommand(cmd.Cmd):
             bol = True
 
         if bol == True:
-            all_dict = storage.all()
+            all_dict = storage.all().copy()
             all_dict_lis = []
             for i in all_dict.keys():
                 sp = i.split(".")
@@ -203,6 +205,7 @@ class HBNBCommand(cmd.Cmd):
                                 user_dic[x2] = str(lis[3])
                             elif type(lis[3]) == float:
                                 user_dic[x2] = float(lis[3])
+                            dic[x]["updated_at"] = datetime.now().isoformat()
                             bol = 1
                             break
                     if bol == 1:
@@ -231,7 +234,7 @@ class HBNBCommand(cmd.Cmd):
         return (dic)
 
     def id_checker(self, id_z):
-        base_data_json = storage.all()
+        base_data_json = storage.all().copy()
 
         for i in base_data_json.keys():
             chk_id = base_data_json[i]["id"]
@@ -260,7 +263,7 @@ class HBNBCommand(cmd.Cmd):
         dic["created_at"] = z_create_at
         dic["updated_at"] = z_update_at
 
-        #formating
+        # formating
 
         instance_class_name = dic["__class__"]
         instance_id = dic["id"]
@@ -269,6 +272,26 @@ class HBNBCommand(cmd.Cmd):
 
         return (full_format)
 
+    def attrebute_checker(self,class_name):
+        
+        #!attrbute list
+        if class_name == User.__name__:  # ? User
+            attrbutes = [x for x in User.__dict__ if not x.startswith('__')]
+        elif class_name == BaseModel.__name__:  # ? BaseModel
+            attrbutes = [x for x in BaseModel.__dict__ if not x.startswith('__')]
+        elif class_name == State.__name__:  # ? State
+            attrbutes = [x for x in State.__dict__ if not x.startswith('__')]
+        elif class_name == City.__name__:  # ? City
+            attrbutes = [x for x in City.__dict__ if not x.startswith('__')]
+        elif class_name == Amenity.__name__:  # ? Amenity
+            attrbutes = [x for x in Amenity.__dict__ if not x.startswith('__')]
+        elif class_name == Place.__name__:  # ? Place
+            attrbutes = [x for x in Place.__dict__ if not x.startswith('__')]
+        elif class_name == Review.__name__:  # ? Place
+            attrbutes = [x for x in Review.__dict__ if not x.startswith('__')]
+        #!attrbute list
+        
+        return (attrbutes)
 
 
     #! my methods------------------------
@@ -330,15 +353,145 @@ class HBNBCommand(cmd.Cmd):
                 ruse_dic = None
 
                 for x in dic.keys():
-                    if dic[x]["id"] == instance_id and dic[x]["__class__"]:
-                        ruse_dic = self.full_format(dic[x])
+                    if dic[x]["id"] == instance_id and dic[x]["__class__"] == lis[0]:
+                        ruse_dic = self.full_format(dic[x].copy())
                         bol = 1
                         break
-                
+
                 if bol == 1:
                     print(ruse_dic)
                 elif bol == 0:
                     print("** no instance found **")
+            else:
+                print("*** Unknown classe: {:s}".format(content))
+        elif method[0] == "destroy":
+
+            if lis[0] in globals():
+                dic = storage.all()
+                method_parameter = method[1].split(")")
+                instance_id = method_parameter[0].replace('"', '')
+
+                for x in dic.keys():
+                    if dic[x]["id"] == instance_id and dic[x]["__class__"] == lis[0]:
+                        del dic[x]
+                        bol = 1
+                        break
+
+                if bol == 1:
+                    with open("file.json", "w") as f:
+                        json.dump(dic, f, indent=2)
+
+                elif bol == 0:
+                    print("** no instance found **")
+            else:
+                print("*** Unknown classe: {:s}".format(content))
+        elif method[0] == "update":
+
+            if lis[0] in globals():
+                dic = storage.all().copy()
+
+                #!! if user updating multi elements
+                #Todo
+                if '{' in lis[1] and '}' in lis[1]:
+                    #Todo zzzzzzzzzzzz
+                    
+                    z_bool = False
+                    cn = 0
+                    zzz_id = ""
+                    #? get the id 
+                    for z in method[1]:
+                        if z == "'" or z == '"':
+                            if cn == 1:
+                                break
+                            z_bool = True
+                            cn += 1
+                        elif z_bool:
+                            zzz_id += z
+                    #? get the id 
+
+
+                    str_z = lis[1]
+                    v = ""
+
+                    brace_found = False
+
+                    for x in str_z:
+                        if x == '}':
+                            v += x
+                            brace_found = False
+                        if brace_found:
+                            v += x
+                        elif x == '{':
+                            brace_found = True
+                            v += x
+
+                    dictionary = ast.literal_eval(v)
+
+                    if type(dictionary) == dict :
+                        
+                        #!attrbute list
+                        attrbutes_z = self.attrebute_checker(lis[0])
+                        #!attrbute list
+
+                        for z in dictionary.keys():
+                            if z not in attrbutes_z:
+                                bol_z = 1
+                                print("** invalid attrebute in dict")
+                                return
+                        vo_z = 0
+                        for z in dic.keys():
+                            if dic[z]["id"] == zzz_id and dic[z]["__class__"] == lis[0]:
+                                 for z_1 in dictionary.keys():
+                                    dic[z][z_1] = dictionary[z_1]
+                                    vo_z = 1
+                            if vo_z == 1:
+                                dic[z]["updated_at"] = datetime.now().isoformat()
+                                break
+                            
+
+                        with open("file.json", "w")as f:
+                            json.dump(dic, f, indent=2)
+
+                        return
+
+
+            #!! if user updating just one element
+                method_parameter = method[1].split(")")
+                full_paramater = method_parameter[0].replace('"', '')            
+                param_lis1 = full_paramater.replace(" ", "")
+                param_lis = param_lis1.split(",")
+
+                not_allowed = ["id", "created_at", "updated_at"]
+                if param_lis[1] not in not_allowed :
+
+                    #!attrbute list
+                    attrbutes = self.attrebute_checker(lis[0])
+                    #!attrbute list
+                    
+
+                    if param_lis[1] in attrbutes:
+                        for x in dic.keys():
+                            if dic[x]["id"] == param_lis[0] and dic[x]["__class__"] == lis[0]:
+
+                                #! castinggggggggg
+                                if param_lis[2].isdigit():
+                                    dic[x][param_lis[1]] = int(param_lis[2])
+                                elif type(param_lis[2]) == str:
+                                    dic[x][param_lis[1]] = str(param_lis[2])
+                                elif type(param_lis[2]) == float:
+                                    dic[x][param_lis[1]] = float(param_lis[2])
+                                dic[x]["updated_at"] = datetime.now().isoformat()
+                                bol = 1
+                                break
+                        if bol == 1:
+                            with open("file.json", "w")as f:
+                                json.dump(dic, f, indent=2)
+                        elif bol == 0 :
+                            print("** no instance found **")
+                    else:
+                        print("** no attribute found **")
+                else :
+                    print("** You do not have the permesions to do this **")
             else:
                 print("*** Unknown classe: {:s}".format(content))
         else:
