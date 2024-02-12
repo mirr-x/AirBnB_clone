@@ -16,7 +16,12 @@ The primary goal of this project is to create a command interpreter that allows 
 
 ## Installation
 
-1. Clone the repository:
-   '''
-   git clonehttps://github.com/mirr-x/AirBnB_clone.git
-   '''
+```
+   git clone https://github.com/mirr-x/AirBnB_clone.git
+```
+```
+   cd AirBnB_clone
+```
+```
+   ./console.py
+```
