@@ -305,12 +305,16 @@ class HBNBCommand(cmd.Cmd):
     def default(self, content):
 
         lis = content.split(".")
-        method = lis[1].split("(")
+        if len(lis) >= 2:
+            method = lis[1].split("(")
+        else:
+            print("*** Unknown syntax: {:s}".format(content))
         lis_len = len(lis)
         bol = 0
 
         if lis_len == 1:
-            print("*** Unknown syntax: {:s}".format(content))
+            # print("*** Unknown syntax: {:s}".format(content))
+            pass
         elif lis[1] == "all()":
 
             if lis[0] in globals():
@@ -501,3 +505,4 @@ class HBNBCommand(cmd.Cmd):
     #!!!!!!!!!!!!!!!
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
+
