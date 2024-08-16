@@ -1,6 +1,6 @@
 # AirBnB Clone - The Console
 
-![](https://i.ibb.co/ncJ1H6Z/65f4a1dd9c51265f49d0.png)
+![blabla](https://i.ibb.co/ncJ1H6Z/65f4a1dd9c51265f49d0.png)
 
 Welcome to the AirBnB clone project! This project involves building a command interpreter to manage AirBnB objects, creating a simple flow of serialization/deserialization, and implementing a file storage engine.
 
